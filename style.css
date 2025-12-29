@@ -15,15 +15,77 @@ body {
     background-attachment: fixed;
     color: #e0e0e0;
     min-height: 100vh;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 200px;
+    background: rgba(0, 0, 0, 0.8);
+    border-right: 2px solid rgba(255, 140, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    position: fixed;
+    height: 100vh;
+    left: 0;
+    top: 0;
+}
+
+.sidebar-nav {
+    flex: 1;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 20px;
+    color: #e0e0e0;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+}
+
+.nav-item:hover {
+    background: rgba(255, 140, 0, 0.1);
+    border-left-color: rgba(255, 140, 0, 0.5);
+}
+
+.nav-item.active {
+    background: rgba(255, 140, 0, 0.15);
+    border-left-color: #ff8c00;
+    color: #ff8c00;
+}
+
+.nav-icon {
+    font-size: 1.2rem;
+}
+
+.nav-text {
+    font-weight: 500;
+}
+
+.version {
+    padding: 15px 20px;
+    text-align: center;
+    color: rgba(255, 140, 0, 0.6);
+    font-size: 0.85rem;
+    border-top: 1px solid rgba(255, 140, 0, 0.2);
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 200px;
     padding: 20px;
 }
 
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-header {
+.header {
     text-align: center;
     margin-bottom: 30px;
     padding: 20px;
@@ -32,22 +94,17 @@ header {
     backdrop-filter: blur(10px);
 }
 
-h1 {
-    color: #ff8c00;
-    font-size: 2rem;
-    margin-bottom: 15px;
-    text-shadow: 0 0 10px rgba(255, 140, 0, 0.5);
-}
-
 .total-isk {
     font-size: 1.2rem;
     color: #ff8c00;
     font-weight: bold;
 }
 
-.controls {
-    margin-bottom: 20px;
+.add-item-container {
+    margin-top: 15px;
     text-align: center;
+    padding: 15px;
+    border-top: 1px solid rgba(255, 140, 0, 0.2);
 }
 
 .btn {
@@ -213,8 +270,26 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 /* Responsive design */
-@media (max-width: 600px) {
-    body {
+@media (max-width: 768px) {
+    .sidebar {
+        width: 60px;
+    }
+
+    .nav-text {
+        display: none;
+    }
+
+    .nav-item {
+        justify-content: center;
+        padding: 15px 10px;
+    }
+
+    .version {
+        font-size: 0.7rem;
+    }
+
+    .main-content {
+        margin-left: 60px;
         padding: 10px;
     }
 
@@ -252,11 +327,7 @@ input[type="number"]::-webkit-outer-spin-button {
         padding: 10px 16px;
     }
 
-    h1 {
-        font-size: 1.5rem;
-    }
-
-    header {
+    .header {
         padding: 15px;
     }
 

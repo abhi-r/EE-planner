@@ -16,13 +16,11 @@ class PlanningTool {
         // Load saved items from localStorage
         this.loadItems();
 
-        // Add initial item if empty
-        if (this.items.length === 0) {
-            this.addItem();
-        }
+        // Update empty state on initial load
+        this.updateEmptyState();
     }
 
-    addItem(name = 'New Item', isk = 0) {
+    addItem(name = '', isk = 0) {
         const id = Date.now() + Math.random();
         const item = { id, name, isk };
         this.items.push(item);
@@ -30,6 +28,38 @@ class PlanningTool {
         this.updateTotal();
         this.updateEmptyState();
         this.saveItems();
+    }
+
+    parseIskValue(input) {
+        if (typeof input === 'number') return input;
+
+        const str = String(input).trim().toLowerCase();
+        if (!str) return 0;
+
+        // Check for shorthand notation
+        const match = str.match(/^([\d.]+)\s*([kmb])?$/);
+        if (!match) return parseFloat(str) || 0;
+
+        const num = parseFloat(match[1]);
+        const suffix = match[2];
+
+        if (!suffix) return num;
+
+        const multipliers = {
+            'k': 1000,
+            'm': 1000000,
+            'b': 1000000000
+        };
+
+        return num * (multipliers[suffix] || 1);
+    }
+
+    formatIskDisplay(value) {
+        if (value === 0) return '';
+        if (value >= 1000000000) return (value / 1000000000).toFixed(2).replace(/\.?0+$/, '') + 'b';
+        if (value >= 1000000) return (value / 1000000).toFixed(2).replace(/\.?0+$/, '') + 'm';
+        if (value >= 1000) return (value / 1000).toFixed(2).replace(/\.?0+$/, '') + 'k';
+        return value.toString();
     }
 
     renderItem(item) {
@@ -50,11 +80,9 @@ class PlanningTool {
                 <div class="item-isk-group">
                     <span class="isk-label">ISK:</span>
                     <input
-                        type="number"
+                        type="text"
                         class="item-isk"
-                        value="${item.isk}"
-                        min="0"
-                        step="1000"
+                        value="${this.formatIskDisplay(item.isk)}"
                         placeholder="0"
                     >
                 </div>
@@ -74,10 +102,26 @@ class PlanningTool {
             this.saveItems();
         });
 
-        iskInput.addEventListener('input', (e) => {
-            item.isk = parseFloat(e.target.value) || 0;
+        iskInput.addEventListener('blur', (e) => {
+            const parsedValue = this.parseIskValue(e.target.value);
+            item.isk = parsedValue;
+            e.target.value = this.formatIskDisplay(parsedValue);
             this.updateTotal();
             this.saveItems();
+        });
+
+        iskInput.addEventListener('focus', (e) => {
+            if (item.isk === 0) {
+                e.target.value = '';
+            } else {
+                e.target.select();
+            }
+        });
+
+        iskInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.target.blur();
+            }
         });
 
         deleteBtn.addEventListener('click', () => this.deleteItem(item.id));
@@ -181,12 +225,15 @@ class PlanningTool {
     }
 
     updateEmptyState() {
+        const addItemContainer = document.querySelector('.add-item-container');
         if (this.items.length === 0) {
             this.emptyState.classList.remove('hidden');
             this.planningList.style.display = 'none';
+            if (addItemContainer) addItemContainer.style.display = 'none';
         } else {
             this.emptyState.classList.add('hidden');
             this.planningList.style.display = 'block';
+            if (addItemContainer) addItemContainer.style.display = 'block';
         }
     }
 
